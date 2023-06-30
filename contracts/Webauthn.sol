@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import {Base64URL} from "./Base64URL.sol";
 import {EllipticCurve} from "./EllipticCurve.sol";
-import "hardhat/console.sol";
 
 error InvalidAuthenticatorData();
 error InvalidClientData();
@@ -20,7 +19,7 @@ contract Webauthn {
         uint clientChallengeDataOffset,
         uint[2] memory rs,
         uint[2] memory Q
-    ) public view returns (bool) {
+    ) public pure returns (bool) {
         // Let the caller check if User Presence (0x01) or User Verification (0x04) are set
         if (
             (authenticatorData[32] & authenticatorDataFlagMask) !=
@@ -47,7 +46,7 @@ contract Webauthn {
             keccak256(abi.encodePacked(challengeExtracted))
         ) {
             revert InvalidClientData();
-        }      
+        }
         // Verify the signature over sha256(authenticatorData || sha256(clientData))
         bytes memory verifyData = new bytes(authenticatorData.length + 32);
         copyBytes(

@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("@nomicfoundation/hardhat-foundry");
 require("hardhat-gas-reporter");
 require("hardhat-preprocessor");
 const removeConsoleLog = require("hardhat-preprocessor").removeConsoleLog;
@@ -16,7 +17,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.17",
+  solidity: "0.8.21",
 	preprocess: {
     eachLine: removeConsoleLog((hre) => hre.network.name !== 'hardhat' && hre.network.name !== 'localhost'),
   },    

@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("@nomicfoundation/hardhat-foundry");
 require("hardhat-gas-reporter");
 require("hardhat-preprocessor");
 const removeConsoleLog = require("hardhat-preprocessor").removeConsoleLog;

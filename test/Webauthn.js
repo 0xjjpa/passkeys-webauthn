@@ -44,7 +44,15 @@ function bufferFromBase64(value) {
 
 describe("Webauthn", function () {
   it("Check message", async function () {
-    const Webauthn = await ethers.getContractFactory("Webauthn");
+    const P256 = await ethers.getContractFactory("P256");
+    const p256 = await P256.deploy();
+    await p256.deployed();
+
+    const Webauthn = await ethers.getContractFactory("Webauthn", {
+      libraries: {
+        P256: p256.address,
+      }
+    });
     const webauthn = await Webauthn.deploy();
     await webauthn.deployed();
 
@@ -64,18 +72,29 @@ describe("Webauthn", function () {
     // Get on the "challenge" key value following "
     const challengeOffset = clientData.indexOf("226368616c6c656e6765223a", 0, "hex") + 12 + 1;
     const signatureParsed = derToRS(signature);
+    const rs = [
+      ethers.BigNumber.from("0x" + signatureParsed[0].toString('hex')),
+      ethers.BigNumber.from("0x" + signatureParsed[1].toString('hex'))
+    ]
 
     const signatureResult = await webauthn.checkSignature(authenticatorData, 0x01, clientData, clientChallenge, challengeOffset,
-      [ethers.BigNumber.from("0x" + signatureParsed[0].toString('hex')), ethers.BigNumber.from("0x" + signatureParsed[1].toString('hex'))],
+      rs,
       pubkeyUintArray
     );
     expect(signatureResult);
 
     const validationResult = await webauthn.validate(authenticatorData, 0x01, clientData, clientChallenge, challengeOffset,
-      [ethers.BigNumber.from("0x" + signatureParsed[0].toString('hex')), ethers.BigNumber.from("0x" + signatureParsed[1].toString('hex'))],
+      rs,
       pubkeyUintArray
     );
+
+    const validationP256Result = await webauthn.validateP256(authenticatorData, 0x01, clientData, clientChallenge, challengeOffset,
+      rs[0], rs[1],
+      pubkeyUintArray[0], pubkeyUintArray[1]
+    );
+
     await validationResult.wait();
+    await validationP256Result.wait();
 
   })
 });
